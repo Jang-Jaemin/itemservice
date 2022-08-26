@@ -15,4 +15,13 @@ public class Item {
         this.price = price;
         this.quantity = quantity;
     }
+
+    public void setItemName(String itemName) {
+    }
+
+    public void setPrice(int price) {
+    }
+
+    public void setQuantity(Integer quantity) {
+    }
 }

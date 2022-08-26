@@ -8,9 +8,7 @@ import hello.itemservice.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -49,6 +47,88 @@ public class BasicItemController {
     @GetMapping("/add")
     public String addForm(){
         return "basic/addForm";
+    }
+    // addItemV1 - BasicItemController에 추가
+    @PostMapping("/add")
+    public String addItemV1(@RequestParam String itemName,
+                            @RequestParam int price,
+                            @RequestParam Integer quantity,
+                            Model model) {
+        Item item = new Item();
+        item.setItemName(itemName);
+        item.setPrice(price);
+        item.setQuantity(quantity);
+        itemRepository.save(item);
+        model.addAttribute("item", item);
+        return "basic/item";
+    //  먼저 @RequestParam String itemName: itemName 요청 파라미터데이터를 해당 변수에 받는다.
+    //  Item객체를 생성하고 itemRepository를 통해서 저장한다.
+    //  저장된 item을 모델에 담아서 뷰에 전달한다.
+    //  중요: 여기서는 상품 상세에서 사용한 item.html 뷰 템플릿을 그대로 재활용한다.
+    }
+
+    /** addItemV2 - 상품등록처리 - ModelAttribute
+     * @ModelAttribute("item") Item item
+     * model.addAttribute("item", item); 자동 추가  */
+    @PostMapping("/add")
+    public String addItemV2(@ModelAttribute("item") Item item, Model model) {
+        itemRepository.save(item);
+        //model.addAttribute("item", item); //자동 추가, 생략 가능
+        return "basic/item";
+
+        //  @ModelAttribute - 요청파라미터처리
+        //  @ModelAttribute는Item객체를생성하고,
+        //  요청파라미터의값을프로퍼티접근법(setXxx)으로 입력해준다.
+    }
+
+    /** addItemV3 - 상품등록처리 - ModelAttribute 이름생략
+     * @ModelAttribute name 생략 가능
+     * model.addAttribute(item); 자동 추가, 생략 가능
+     * 생략시 model에 저장되는 name은 클래스명 첫글자만 소문자로 등록 Item -> item  */
+    @PostMapping("/add")
+    public String addItemV3(@ModelAttribute Item item) {
+        itemRepository.save(item);
+        return "basic/item";
+        //  @ModelAttribute의이름을생략할수있다.
+        //  주의
+        //  @ModelAttribute의 이름을 생략하면 모델에 저장 될 때 클래스명을 사용한다.
+        //  이때 클래스의 첫 글자만 소문자로 변경해서 등록한다.
+        //  예) @ModelAttribute 클래스명 모델에자동추가되는이름
+        //  Item --> item
+        //  HelloWorld -->  helloWorld
+    }
+
+    /** addItemV4 - 상품등록처리 - ModelAttribute 전체생략
+     * @ModelAttribute 자체 생략 가능
+     * model.addAttribute(item) 자동 추가  */
+    @PostMapping("/add")
+    public String addItemV4(Item item) {
+        itemRepository.save(item);
+        return "basic/item";
+        //  @ModelAttribute 자체도생략가능하다. 대상객체는모델에자동등록된다.
+        //  나머지사항은기존과 동일하다.
+    }
+    //  상품 수정 폼 컨트롤러 , BasicItemController에 추가
+    //  수정에 필요한 정보를 조회하고, 수정 용폼 뷰를 호출한다.
+    @GetMapping("/{itemId}/edit")
+    public String editForm(@PathVariable Long itemId, Model model) {
+        Item item = itemRepository.findById(itemId);
+        model.addAttribute("item", item);
+        return "basic/editForm";
+    }
+    //  상품 수정 개발
+    @PostMapping("/{itemId}/edit")
+    public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
+        itemRepository.update(itemId, item);
+        return "redirect:/basic/items/{itemId}";
+        //  상품 수정은 상품등록과 전체프로세스가 유사하다.
+        //  GET  /items/{itemId}/edit: 상품수정폼
+        //  POST /items/{itemId}/edit: 상품수정처리
+
+        //  리 다이렉트
+        //  상품 수정은 마지막에 뷰 템플릿을 호출하는 대신에 상품 상세 화면으로 이동하도록 리 다이렉트를 호출한다.
+        //  스프링은 redirect:/...으로 편리하게 리 다이렉트를 지원한다. redirect:/basic/items/{itemId}
+        //  컨트롤러에 매핑된@PathVariable의 값은 redirect에도 사용할 수 있다.
     }
 }
 
