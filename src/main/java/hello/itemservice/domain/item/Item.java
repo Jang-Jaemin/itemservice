@@ -2,6 +2,7 @@ package hello.itemservice.domain.item;
 
 public class Item {
 
+    public int getPrice;
     private Long id;
     private String itemName;
     private Integer price;
@@ -23,5 +24,14 @@ public class Item {
     }
 
     public void setQuantity(Integer quantity) {
+    }
+
+    public Object getId() {
+    }
+
+    public String getItemName() {
+    }
+
+    public Integer getQuantity() {
     }
 }

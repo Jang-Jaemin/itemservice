@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -129,6 +130,26 @@ public class BasicItemController {
         //  상품 수정은 마지막에 뷰 템플릿을 호출하는 대신에 상품 상세 화면으로 이동하도록 리 다이렉트를 호출한다.
         //  스프링은 redirect:/...으로 편리하게 리 다이렉트를 지원한다. redirect:/basic/items/{itemId}
         //  컨트롤러에 매핑된@PathVariable의 값은 redirect에도 사용할 수 있다.
+    }
+    /**
+     * RedirectAttributes  */
+    @PostMapping("/add")
+    public String addItemV6(Item item, RedirectAttributes redirectAttributes) {
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/basic/items/{itemId}";
+
+        //  리다이렉트 할 때 간단히 status=true를 추가 해보자. 그리고 뷰템플릿에서 이 값이 있으면, 저장되었습니다. 라는 메시지를 출력해보자.
+
+        //  실행 해보면 다음과 같은 리다이렉트 결과가 나온다.
+        //  http://localhost:8080/basic/items/3?status=true
+
+        //  RedirectAttributes
+        //  RedirectAttributes를 사용하면 URL 인코딩도해주고, pathVarible, 쿼리파라미터까지처리해준다.
+        //  redirect:/basic/items/{itemId}
+        //  pathVariable 바인딩: {itemId}
+        //  나머지는쿼리파라미터로처리: ?status=true
     }
 }
 
